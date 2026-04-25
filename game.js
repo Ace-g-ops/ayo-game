@@ -9,6 +9,8 @@ let isAnimating = false;
 let pitStates = [];
 let gameMode = 'multi';
 let audioContext = null;
+let gameStarted = false;
+const WIN_SCORE = 24;
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 2;
@@ -86,7 +88,12 @@ function getGameModeFromURL() {
 }
 
 function backToMenu() {
-    window.location.href = 'landing.html';
+    window.location.href = 'index.html';
+}
+
+function startGameFromInstructions() {
+    gameStarted = true;
+    document.getElementById('instructions-modal').style.display = 'none';
 }
 
 // ==================== INITIALIZATION ====================
@@ -137,6 +144,11 @@ function init() {
         
         animate();
         console.log('Game initialized successfully!');
+        
+        // Show instruction screen after initialization
+        setTimeout(() => {
+            document.getElementById('instructions-modal').style.display = 'block';
+        }, 500);
     } catch (error) {
         console.error('Error during initialization:', error);
         alert('Error initializing game: ' + error.message);
@@ -255,7 +267,7 @@ function updateScoreDisplay() {
 }
 
 function onBoardClick(event) {
-    if (isAnimating) return;
+    if (isAnimating || !gameStarted) return;
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
@@ -474,6 +486,12 @@ function updateTurnIndicator() {
 
 // ==================== GAME END ====================
 function checkGameEnd() {
+    // Check for score target win condition (first to 24 points)
+    if (scores[1] >= WIN_SCORE || scores[2] >= WIN_SCORE) {
+        showGameOver();
+        return;
+    }
+    
     // Game ends when one player has no seeds on their side
     const player1Seeds = pitStates.slice(0, 6).reduce((a, b) => a + b, 0);
     const player2Seeds = pitStates.slice(6, 12).reduce((a, b) => a + b, 0);
@@ -493,7 +511,7 @@ function checkGameEnd() {
 function isGameOver() {
     const player1Seeds = pitStates.slice(0, 6).reduce((a, b) => a + b, 0);
     const player2Seeds = pitStates.slice(6, 12).reduce((a, b) => a + b, 0);
-    return player1Seeds === 0 || player2Seeds === 0;
+    return player1Seeds === 0 || player2Seeds === 0 || scores[1] >= WIN_SCORE || scores[2] >= WIN_SCORE;
 }
 
 function showGameOver() {
@@ -520,8 +538,12 @@ function resetGame() {
     document.getElementById('game-over').style.display = 'none';
     
     // Reset game state
+    gameStarted = false;
     currentPlayer = 1;
     initializeGameState();
+    
+    // Show instruction screen again
+    document.getElementById('instructions-modal').style.display = 'block';
 }
 
 // ==================== RESPONSIVE HANDLING ====================
