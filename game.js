@@ -11,6 +11,9 @@ let gameMode = 'multi';
 let audioContext = null;
 let gameStarted = false;
 const WIN_SCORE = 24;
+let playerAvatar = '🦁';
+let player2Avatar = '🐘';
+const AVATAR_OPTIONS = ['🦁', '🐘', '🦅', '🐯', '🦒', '🐆'];
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 2;
@@ -87,6 +90,39 @@ function getGameModeFromURL() {
     return mode === 'single' ? 'single' : 'multi';
 }
 
+function loadAvatars() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const avatarParam = urlParams.get('avatar');
+    
+    // Load player avatar from URL or localStorage
+    if (avatarParam) {
+        playerAvatar = decodeURIComponent(avatarParam);
+    } else {
+        playerAvatar = localStorage.getItem('ayoAvatar') || '🦁';
+    }
+    
+    // Assign random avatar to player 2 in single-player mode
+    if (gameMode === 'single') {
+        const randomIndex = Math.floor(Math.random() * AVATAR_OPTIONS.length);
+        player2Avatar = AVATAR_OPTIONS[randomIndex];
+    } else {
+        // In multiplayer, player 2 gets a random avatar different from player 1
+        const availableAvatars = AVATAR_OPTIONS.filter(a => a !== playerAvatar);
+        const randomIndex = Math.floor(Math.random() * availableAvatars.length);
+        player2Avatar = availableAvatars[randomIndex];
+    }
+    
+    // Update UI
+    updateAvatarDisplay();
+}
+
+function updateAvatarDisplay() {
+    const avatar1El = document.getElementById('avatar1');
+    const avatar2El = document.getElementById('avatar2');
+    if (avatar1El) avatar1El.textContent = playerAvatar;
+    if (avatar2El) avatar2El.textContent = player2Avatar;
+}
+
 function backToMenu() {
     window.location.href = 'index.html';
 }
@@ -118,6 +154,7 @@ function init() {
     try {
         initAudio();
         gameMode = getGameModeFromURL();
+        loadAvatars();
         console.log('Game mode:', gameMode);
         
         scene = new THREE.Scene();
@@ -140,7 +177,7 @@ function init() {
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
         window.addEventListener('resize', onWindowResize, false);
-        renderer.domElement.addEventListener('click', onBoardClick, false);
+        renderer.domElement.addEventListener('pointerdown', onBoardClick, false);
         
         animate();
         console.log('Game initialized successfully!');
@@ -540,6 +577,7 @@ function resetGame() {
     // Reset game state
     gameStarted = false;
     currentPlayer = 1;
+    loadAvatars();
     initializeGameState();
     
     // Show instruction screen again

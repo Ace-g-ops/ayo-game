@@ -83,6 +83,52 @@
             50% { transform: translateY(-10px); }
         }
 
+        .avatar-section {
+            margin-bottom: 30px;
+        }
+
+        .avatar-section h3 {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2a2a4a 0%, #1a1a3e 100%);
+            border: 3px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+            transform: scale(1.15);
+        }
+
         .mode-buttons {
             display: flex;
             gap: 20px;
@@ -136,6 +182,17 @@
                 height: 160px;
             }
 
+            .avatar-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .avatar-option {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
             .play-button {
                 padding: 15px 35px;
                 font-size: 1rem;
@@ -148,14 +205,60 @@
         <h1 class="game-title">Ayo Olopon</h1>
         <p class="game-subtitle">Traditional African Strategy Game</p>
         <div class="game-preview"></div>
+        
+        <div class="avatar-section">
+            <h3>Choose Your Avatar</h3>
+            <div class="avatar-grid" id="avatar-grid">
+                <div class="avatar-option selected" data-avatar="🦁">🦁</div>
+                <div class="avatar-option" data-avatar="🐘">🐘</div>
+                <div class="avatar-option" data-avatar="🦅">🦅</div>
+                <div class="avatar-option" data-avatar="🐯">🐯</div>
+                <div class="avatar-option" data-avatar="🦒">🦒</div>
+                <div class="avatar-option" data-avatar="🐆">🐆</div>
+            </div>
+        </div>
+        
         <div class="mode-buttons">
-            <a href="game.html?mode=single" class="play-button single-player">
+            <a href="game.html?mode=single" class="play-button single-player" id="single-btn">
                 🤖 Single Player
             </a>
-            <a href="game.html?mode=multi" class="play-button multi-player">
+            <a href="game.html?mode=multi" class="play-button multi-player" id="multi-btn">
                 👥 Two Players
             </a>
         </div>
     </div>
+    
+    <script>
+        // Avatar selection
+        let selectedAvatar = localStorage.getItem('ayoAvatar') || '🦁';
+        
+        // Update UI with saved avatar
+        document.querySelectorAll('.avatar-option').forEach(option => {
+            if (option.dataset.avatar === selectedAvatar) {
+                option.classList.add('selected');
+            }
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedAvatar = option.dataset.avatar;
+                localStorage.setItem('ayoAvatar', selectedAvatar);
+            });
+        });
+        
+        // Update button links with avatar
+        function updateButtonLinks() {
+            const singleBtn = document.getElementById('single-btn');
+            const multiBtn = document.getElementById('multi-btn');
+            singleBtn.href = `game.html?mode=single&avatar=${encodeURIComponent(selectedAvatar)}`;
+            multiBtn.href = `game.html?mode=multi&avatar=${encodeURIComponent(selectedAvatar)}`;
+        }
+        
+        updateButtonLinks();
+        
+        // Update links when avatar changes
+        document.querySelectorAll('.avatar-option').forEach(option => {
+            option.addEventListener('click', updateButtonLinks);
+        });
+    </script>
 </body>
 </html>
