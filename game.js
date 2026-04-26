@@ -603,6 +603,26 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+// ==================== ORIENTATION HANDLING ====================
+function checkOrientation() {
+    const isMobile = window.innerWidth <= 768;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    
+    if (isMobile && isPortrait) {
+        document.body.classList.add('portrait-mode');
+    } else {
+        document.body.classList.remove('portrait-mode');
+    }
+}
+
+// Check orientation on load and on orientation change
+window.addEventListener('load', checkOrientation);
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('orientationchange', checkOrientation);
+
+// Also check after a short delay to ensure DOM is ready
+setTimeout(checkOrientation, 100);
+
 // ==================== START GAME ====================
 window.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, starting game initialization...');

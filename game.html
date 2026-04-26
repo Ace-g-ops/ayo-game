@@ -361,16 +361,16 @@
         }
 
         /* Portrait orientation warning for mobile devices only */
-        @media screen and (max-width: 768px) and (orientation: portrait) {
-            #portrait-warning {
-                display: flex !important;
-            }
+        body.portrait-mode #portrait-warning {
+            display: flex !important;
+        }
 
-            #game-container,
-            .hud,
-            .instructions {
-                display: none !important;
-            }
+        body.portrait-mode #game-container,
+        body.portrait-mode .hud,
+        body.portrait-mode .instructions,
+        body.portrait-mode #game-over,
+        body.portrait-mode #instructions-modal {
+            display: none !important;
         }
 
         #portrait-warning {
@@ -381,7 +381,7 @@
             width: 100vw;
             height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            z-index: 1000;
+            z-index: 99999;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -415,6 +415,23 @@
             line-height: 1.5;
         }
     </style>
+    <script>
+        function checkOrientation() {
+            const isMobile = window.innerWidth <= 768;
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isMobile && isPortrait) {
+                document.body.classList.add('portrait-mode');
+            } else {
+                document.body.classList.remove('portrait-mode');
+            }
+        }
+        
+        window.addEventListener('load', checkOrientation);
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        checkOrientation();
+    </script>
 </head>
 <body>
     <div id="portrait-warning">
