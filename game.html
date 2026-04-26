@@ -47,25 +47,26 @@
         }
 
         .turn-indicator {
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 12px 30px;
             border-radius: 25px;
             font-size: 16px;
             font-weight: bold;
-            color: #ffffff;
+            color: #ffffff !important;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .turn-indicator.player1 {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
+            color: #ffffff !important;
             font-weight: 900;
         }
 
         .turn-indicator.player2 {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #ffffff;
+            color: #ffffff !important;
             font-weight: 900;
         }
 
@@ -81,14 +82,19 @@
 
         .score-board .player {
             font-weight: bold;
+            color: #ffffff !important;
         }
 
         .score-board .player.player1 {
-            color: #667eea;
+            color: #667eea !important;
         }
 
         .score-board .player.player2 {
-            color: #f5576c;
+            color: #f5576c !important;
+        }
+
+        .score-board span {
+            color: #ffffff !important;
         }
 
         .avatar-display {
