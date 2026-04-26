@@ -69,6 +69,36 @@
             display: inline-block;
         }
 
+        #mobile-blocker {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 2147483647;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #mobile-blocker h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        #mobile-blocker p {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
         .game-preview {
             width: 300px;
             height: 200px;
@@ -212,10 +242,27 @@
     </style>
 </head>
 <body>
+    <script>
+        function isMobileDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const mobileRegex = /android|ipad|iphone|ipod|windows phone|iemobile|blackberry|mobile/i;
+            return mobileRegex.test(userAgent) || window.innerWidth <= 1024;
+        }
+
+        if (isMobileDevice()) {
+            document.getElementById('mobile-blocker').style.display = 'flex';
+            document.querySelector('.landing-content').style.display = 'none';
+        }
+    </script>
+    <div id="mobile-blocker">
+        <h2>Desktop Only</h2>
+        <p>This game is designed and optimized for desktop or laptop devices.</p>
+    </div>
+
     <div class="landing-content">
         <h1 class="game-title">Ayo Olopon</h1>
         <p class="game-subtitle">Traditional African Strategy Game</p>
-        <p class="device-notice">Best played on desktop</p>
+        <p class="device-notice">Desktop Only</p>
         <div class="game-preview"></div>
         
         <div class="avatar-section">
