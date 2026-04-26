@@ -359,9 +359,70 @@
                 font-size: 16px;
             }
         }
+
+        /* Portrait orientation warning for mobile devices only */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            #portrait-warning {
+                display: flex !important;
+            }
+
+            #game-container,
+            .hud,
+            .instructions {
+                display: none !important;
+            }
+        }
+
+        #portrait-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #portrait-warning .rotate-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: rotate-icon 2s ease-in-out infinite;
+        }
+
+        @keyframes rotate-icon {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-90deg); }
+            75% { transform: rotate(-90deg); }
+        }
+
+        #portrait-warning h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        #portrait-warning p {
+            font-size: 1rem;
+            color: #a0a0a0;
+            max-width: 300px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
+    <div id="portrait-warning">
+        <div class="rotate-icon">📱</div>
+        <h2>Rotate Your Device</h2>
+        <p>Please rotate your device horizontally for the best gameplay experience.</p>
+    </div>
+
     <div id="game-container"></div>
     
     <div class="hud">
