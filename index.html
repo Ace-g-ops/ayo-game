@@ -74,10 +74,10 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            z-index: 2147483647;
+            z-index: 999999;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -242,18 +242,6 @@
     </style>
 </head>
 <body>
-    <script>
-        function isMobileDevice() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const mobileRegex = /android|ipad|iphone|ipod|windows phone|iemobile|blackberry|mobile/i;
-            return mobileRegex.test(userAgent) || window.innerWidth <= 1024;
-        }
-
-        if (isMobileDevice()) {
-            document.getElementById('mobile-blocker').style.display = 'flex';
-            document.querySelector('.landing-content').style.display = 'none';
-        }
-    </script>
     <div id="mobile-blocker">
         <h2>Desktop Only</h2>
         <p>This game is designed and optimized for desktop or laptop devices.</p>
@@ -318,6 +306,29 @@
         document.querySelectorAll('.avatar-option').forEach(option => {
             option.addEventListener('click', updateButtonLinks);
         });
+
+        // Mobile detection and blocking
+        function isMobileDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const mobileRegex = /android|ipad|iphone|ipod|windows phone|iemobile|blackberry|mobile/i;
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmallScreen = window.innerWidth <= 1024;
+            
+            return mobileRegex.test(userAgent) || isTouchDevice || isSmallScreen;
+        }
+
+        function checkMobile() {
+            if (isMobileDevice()) {
+                document.getElementById('mobile-blocker').style.display = 'flex';
+                document.querySelector('.landing-content').style.display = 'none';
+            }
+        }
+
+        // Check immediately when DOM is ready
+        checkMobile();
+        
+        // Also check on window resize (in case user rotates device)
+        window.addEventListener('resize', checkMobile);
     </script>
 </body>
 </html>
