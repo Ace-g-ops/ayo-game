@@ -160,7 +160,7 @@ function init() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a2e);
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 8, 8);
+        updateCameraPosition();
         camera.lookAt(0, 0, 0);
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -585,10 +585,22 @@ function resetGame() {
 }
 
 // ==================== RESPONSIVE HANDLING ====================
+function updateCameraPosition() {
+    const isMobile = window.innerWidth <= 768;
+    const isLandscape = window.innerWidth > window.innerHeight;
+    
+    if (isMobile && isLandscape) {
+        camera.position.set(0, 6, 7);
+    } else {
+        camera.position.set(0, 8, 8);
+    }
+}
+
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    updateCameraPosition();
 }
 
 // ==================== ANIMATION LOOP ====================

@@ -360,6 +360,52 @@
             }
         }
 
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            .hud {
+                flex-direction: row;
+                gap: 8px;
+                top: 5px;
+                padding: 5px 10px;
+            }
+
+            .turn-indicator {
+                font-size: 12px;
+                padding: 6px 15px;
+            }
+
+            .score-board {
+                font-size: 11px;
+                padding: 6px 12px;
+                gap: 12px;
+            }
+
+            .score-board .player {
+                font-size: 11px;
+            }
+
+            .avatar-display {
+                gap: 4px;
+                font-size: 18px;
+            }
+
+            .avatar-display .avatar {
+                width: 20px;
+                height: 20px;
+                font-size: 14px;
+            }
+
+            .restart-btn, .menu-btn {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+
+            .instructions {
+                font-size: 10px;
+                padding: 5px 12px;
+                bottom: 5px;
+            }
+        }
+
         /* Portrait orientation warning for mobile devices only */
         body.portrait-mode #portrait-warning {
             display: flex !important;
