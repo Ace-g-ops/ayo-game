@@ -239,6 +239,71 @@
                 font-size: 1rem;
             }
         }
+
+        /* Difficulty Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px 50px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            animation: popIn 0.3s ease;
+        }
+
+        .modal-content h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .difficulty-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .difficulty-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -265,12 +330,23 @@
         </div>
         
         <div class="mode-buttons">
-            <a href="game.html?mode=single" class="play-button single-player" id="single-btn">
+            <button class="play-button single-player" id="single-btn">
                 🤖 Single Player
-            </a>
+            </button>
             <a href="game.html?mode=multi" class="play-button multi-player" id="multi-btn">
                 👥 Two Players
             </a>
+        </div>
+    </div>
+
+    <div id="difficulty-modal" class="modal">
+        <div class="modal-content">
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-options">
+                <button class="difficulty-btn" data-difficulty="easy">Easy</button>
+                <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+            </div>
         </div>
     </div>
     
@@ -293,9 +369,7 @@
         
         // Update button links with avatar
         function updateButtonLinks() {
-            const singleBtn = document.getElementById('single-btn');
             const multiBtn = document.getElementById('multi-btn');
-            singleBtn.href = `game.html?mode=single&avatar=${encodeURIComponent(selectedAvatar)}`;
             multiBtn.href = `game.html?mode=multi&avatar=${encodeURIComponent(selectedAvatar)}`;
         }
         
@@ -328,6 +402,44 @@
         
         // Also check on window resize (in case user rotates device)
         window.addEventListener('resize', checkMobile);
+
+        // Difficulty modal handling
+        function setupDifficultyModal() {
+            const singleBtn = document.getElementById('single-btn');
+            const difficultyModal = document.getElementById('difficulty-modal');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+            if (!singleBtn || !difficultyModal || difficultyBtns.length === 0) {
+                console.error('Modal elements not found');
+                return;
+            }
+
+            singleBtn.addEventListener('click', () => {
+                difficultyModal.style.display = 'flex';
+            });
+
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const difficulty = btn.dataset.difficulty;
+                    difficultyModal.style.display = 'none';
+                    window.location.href = `game.html?mode=single&difficulty=${difficulty}&avatar=${encodeURIComponent(selectedAvatar)}`;
+                });
+            });
+
+            // Close modal on outside click
+            difficultyModal.addEventListener('click', (e) => {
+                if (e.target === difficultyModal) {
+                    difficultyModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Run modal setup after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupDifficultyModal);
+        } else {
+            setupDifficultyModal();
+        }
     </script>
 </body>
 </html>

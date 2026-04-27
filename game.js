@@ -8,6 +8,7 @@ let scores = { 1: 0, 2: 0 };
 let isAnimating = false;
 let pitStates = [];
 let gameMode = 'multi';
+let aiDifficulty = 'medium';
 let audioContext = null;
 let gameStarted = false;
 const WIN_SCORE = 24;
@@ -90,6 +91,12 @@ function getGameModeFromURL() {
     return mode === 'single' ? 'single' : 'multi';
 }
 
+function getAIDifficulty() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const difficulty = urlParams.get('difficulty');
+    return difficulty || 'medium';
+}
+
 function loadAvatars() {
     const urlParams = new URLSearchParams(window.location.search);
     const avatarParam = urlParams.get('avatar');
@@ -101,15 +108,19 @@ function loadAvatars() {
         playerAvatar = localStorage.getItem('ayoAvatar') || '🦁';
     }
     
+    // Fallback for corrupted AVATAR_OPTIONS
+    const validAvatars = AVATAR_OPTIONS.filter(a => a && a.length > 0);
+    const avatarPool = validAvatars.length > 0 ? validAvatars : ['🦁', '🐘', '🦅', '🐯', '🦒', '🐆'];
+    
     // Assign random avatar to player 2 in single-player mode
     if (gameMode === 'single') {
-        const randomIndex = Math.floor(Math.random() * AVATAR_OPTIONS.length);
-        player2Avatar = AVATAR_OPTIONS[randomIndex];
+        const randomIndex = Math.floor(Math.random() * avatarPool.length);
+        player2Avatar = avatarPool[randomIndex];
     } else {
         // In multiplayer, player 2 gets a random avatar different from player 1
-        const availableAvatars = AVATAR_OPTIONS.filter(a => a !== playerAvatar);
+        const availableAvatars = avatarPool.filter(a => a !== playerAvatar);
         const randomIndex = Math.floor(Math.random() * availableAvatars.length);
-        player2Avatar = availableAvatars[randomIndex];
+        player2Avatar = availableAvatars[randomIndex] || avatarPool[0];
     }
     
     // Update UI
@@ -154,8 +165,10 @@ function init() {
     try {
         initAudio();
         gameMode = getGameModeFromURL();
+        aiDifficulty = getAIDifficulty();
         loadAvatars();
         console.log('Game mode:', gameMode);
+        console.log('AI difficulty:', aiDifficulty);
         
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a2e);
@@ -453,25 +466,78 @@ async function animateCapture(pitIndex) {
 function aiMove() {
     if (isAnimating || isGameOver()) return;
     
-    // Simple AI: choose a pit with seeds that maximizes capture potential
-    const aiPits = [6, 7, 8, 9, 10, 11]; // AI's pits
+    const aiPits = [6, 7, 8, 9, 10, 11];
     const validPits = aiPits.filter(pit => pitStates[pit] > 0);
     
     if (validPits.length === 0) return;
     
-    // Score each possible move
+    let selectedPit;
+    
+    switch (aiDifficulty) {
+        case 'easy':
+            // Random move
+            selectedPit = validPits[Math.floor(Math.random() * validPits.length)];
+            break;
+        case 'medium':
+            // Prefer captures with some randomness
+            selectedPit = getBestMove(validPits, false);
+            break;
+        case 'hard':
+            // Strongest move evaluation
+            selectedPit = getBestMove(validPits, true);
+            break;
+        default:
+            selectedPit = validPits[0];
+    }
+    
+    makeMove(selectedPit);
+}
+
+function getBestMove(validPits, useStrongEvaluation) {
     let bestPit = validPits[0];
     let bestScore = -Infinity;
     
     for (const pit of validPits) {
-        const score = evaluateMove(pit);
+        const score = useStrongEvaluation ? evaluateMoveHard(pit) : evaluateMove(pit);
         if (score > bestScore) {
             bestScore = score;
             bestPit = pit;
         }
     }
     
-    makeMove(bestPit);
+    return bestPit;
+}
+
+function evaluateMoveHard(pitIndex) {
+    // Strong evaluation: consider captures, landing position, and future potential
+    let score = pitStates[pitIndex] * 2;
+    
+    const seeds = pitStates[pitIndex];
+    let currentPit = pitIndex;
+    
+    // Simulate the move
+    for (let i = 0; i < seeds; i++) {
+        currentPit = getNextPit(currentPit);
+        if (currentPit === pitIndex && i < seeds - 1) {
+            currentPit = getNextPit(currentPit);
+        }
+    }
+    
+    // Check if we can capture
+    const landingSeeds = pitStates[currentPit];
+    if (landingSeeds === 2 || landingSeeds === 3) {
+        const pitPlayer = pits[currentPit].userData.player;
+        if (pitPlayer !== 2) {
+            score += 10; // Big bonus for capture
+        }
+    }
+    
+    // Prefer landing on opponent's side
+    if (pits[currentPit].userData.player !== 2) {
+        score += 5;
+    }
+    
+    return score;
 }
 
 function evaluateMove(pitIndex) {
